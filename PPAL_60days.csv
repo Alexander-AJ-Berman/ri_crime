@@ -1,4 +1,4 @@
-Arrest Date,Year,Month,Last Name,First Name,Gender,Race,Ethnicity,Year of Birth,Age,From Address,From City,From State,Statute Type,Statute Code,Statute Desc,Counts,Case Number,Arresting Officers
+Arrest Date,Year,Month,Last Name,First Name,Gender,Race,Ethnicity,Year of Birth,Age,Example Address,City,State,Statute Type,Statute Code,Statute Desc,Counts,Case Number,Arresting Officers
 03/03/2019 03:48:00 AM,2019,3,Oreilana,Jorge,Male,White,Hispanic,1993,25,407 MT PLEASANT AVE,Providence,,RI Statute Violation,31-11-18,"Driving after Denial, Suspension or Revocation of License",1,2019-00019680, MLuke
 03/03/2019 03:20:00 AM,2019,3,brooks,jade,Female,White,,1983,35,18407 SOUTH NORMANDY,gardina,,,,,,2019-00019678," ADiaz, RJoseph, JLeroux"
 03/03/2019 03:07:00 AM,2019,3,GUADRON,ANTONIO,Male,White,Hispanic,1951,67,46 JULIAN ST,Providence,,RI Statute Violation,11-5-3,DOMESTIC-SIMPLE ASSAULT/BATTERY,1,2019-00019674," CBeach, MPlace, JPerez"
