@@ -10,25 +10,20 @@ def main():
     client = MongoClient(uri)
 
     db = client.get_database()
-    db_cm = db['cases']
+    db_cases = db['cases']
+    db_arrests = db['arrests']
 
-    data = pd.read_csv("./PPCL_180days.csv")
-    data_json = json.loads(data.to_json(orient='records'))
-    db_cm.insert_many(data_json)
+    case_data = pd.read_csv("./PPCL_180days.csv")
+    arrest_data = pd.read_csv("./PPAL_60days.csv")
 
-    # header = [
-    #     "CaseNumber",
-    #     "Location",
-    #     "Reported Date",
-    #     "Month",
-    #     "Year",
-    #     "Offense Desc", s
-    #     "Statute Code",
-    #     "Statute Desc",
-    #     "Counts",
-    #     "Reporting Officer"
-    # ]
+    case_json = json.loads(case_data.to_json(orient='records'))
+    arrest_json = json.loads(arrest_data.to_json(orient='records'))
 
+    #db_arrests.insert_many(arrest_json)
+
+    # Appending a new attribute to case_json
+    for case in case_json:
+        case['Arrests'] = []
 
 
 
