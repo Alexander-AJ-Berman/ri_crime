@@ -1,20 +1,47 @@
-import { Stitch } from 'mongodb-stitch-browser-sdk';
-import {
-  HttpServiceClient,
-  HttpRequest,
-  HttpMethod
-} from 'mongodb-stitch-browser-services-http';
-// 1. Instantiate an HTTP Service Client
-const app = Stitch.defaultAppClient;
-const http = app.getServiceClient(HttpServiceClient.factory, "myHttp");
+const express = require('express');
+const app = express();
+const port = 3000;
+app.set('view engine', 'ejs');
+var mongoose = require('mongoose');
 
-// 2. Build a new HttpRequest
-const request = new HttpRequest.Builder()
-  .withMethod(HttpMethod.GET)
-  .withUrl("https://www.example.com/users")
-  .build()
+var mongoDB = 'mongodb://user:password1@ds159025.mlab.com:59025/ri_crime_data';
 
-// 3. Execute the built request
-http.execute(request)
-  .then(console.log)
-  .catch(console.error)
+mongoose.connect(mongoDB, { useNewUrlParser: true });
+var db = mongoose.connection;
+db.on('error', console.error.bind(console, 'MongoDB connection error:'));
+sample_data = ["hi", "hey", "hello"];
+
+let caseSchema = new mongoose.Schema({
+  "_id": String,
+  "Arrest Date": String,
+  "Year": Number,
+  "Month": Number,
+  "Last Name": String,
+  "First Name": String,
+  "Gender": String,
+  "Race": String,
+  "Ethnicity": String,
+  "Year of Birth": Number,
+  "Age": Number,
+  "From Address": String,
+  "From City": String,
+  "From State": String,
+  "Statute Type": String,
+  "Statute Code": String,
+  "Statute Desc": String,
+  "Counts": Number,
+  "Case Number": String,
+  "Arresting Officers": String
+})
+
+let Cases = mongoose.model('Cases', caseSchema);
+app.get('/', function(req, res) {
+  // Cases.find({}, function (err, cases) {
+  //   cases.forEach(function(el) {
+  //     console.log(el);
+  //   })
+  // })
+  res.render("test.ejs", {data: sample_data});
+});
+
+app.listen(port, () => console.log('Port 3000...'));

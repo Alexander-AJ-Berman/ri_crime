@@ -1,0 +1,24 @@
+{
+  "name": "ri_crime",
+  "version": "1.0.0",
+  "description": "",
+  "main": "map.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Alexander-AJ-Berman/ri_crime.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Alexander-AJ-Berman/ri_crime/issues"
+  },
+  "homepage": "https://github.com/Alexander-AJ-Berman/ri_crime#readme",
+  "dependencies": {
+    "ejs": "^2.6.1",
+    "express": "^4.16.4",
+    "mongoose": "^5.4.21"
+  }
+}
