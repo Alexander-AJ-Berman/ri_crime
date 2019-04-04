@@ -12,6 +12,7 @@ mongoose.connect(mongoDB, { useNewUrlParser: true });
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 sample_data = [];
+arrest = [];
 
 let caseSchema = new mongoose.Schema({
   "_id": String,
@@ -31,19 +32,23 @@ let Cases = mongoose.model('Cases', caseSchema);
 app.get('/', function(req, res) {
   Cases.find({}, function (err, cases) {
     cases.forEach(function(el) {
-      
+
       // we need to fix this, this is such a hack!
       str_arr = String(el).match(/\w+|'[^']+'/g);
       let i = str_arr.indexOf("Location");
       address = str_arr[i+1];
-      sample_data.push(address);  
+      let j = str_arr.indexOf("Arrests");
+      let x = "A";
+      if (!str_arr[j+1]) {
+        x = "C";
+      }
+      sample_data.push(address + x);
     })
     render(res);
   })
 });
 
 function render(res) {
-  console.log(sample_data);
   res.render("test.ejs", {data: sample_data});
 }
 
