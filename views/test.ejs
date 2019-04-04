@@ -34,7 +34,6 @@
     let addresses = String(data).split("&#39;").filter(address => address.length > 2);
     // In the following example, markers appear when the user clicks on the map.
     // Each marker is labeled with a single alphabetical character.
-    var positions = [];
     let providence = {
         lat: 41.8240,
         lng: -71.4128
@@ -71,10 +70,14 @@
       // }
    // }
    function loadAddresses(geocoder,map, writeToCSV) {
-    for (let i = 0; i < 10; i++) {
-        geocodeAddress(addresses[i], geocoder, map, positions);
+    var positions = [];
+    print = false;
+    for (let i = 0; i < addresses.length; i++) {
+      if (i == addresses.length - 1) {
+        print = true;
       }
-    writeToCSV();
+        geocodeAddress(addresses[i], geocoder, map, positions,print);
+      }
    }
     function getPoints() {
             console.log(addresses);
@@ -103,32 +106,31 @@
       });
     }
 
-    function geocodeAddress(address, geocoder, resultsMap, positions) {
+    function geocodeAddress(address, geocoder, resultsMap, positions,print) {
 
       // var address = document.getElementById('address').value;
           geocoder.geocode({'address': address }, function(results, status) {
             if (status === 'OK') {
             // resultsMap.setCenter(results[0].geometry.location);
               position = results[0].geometry.location;
-              arr = []
+              arr = [];
               arr.push(position.lat());
               arr.push(position.lng());
-              console.log(positions);
+              document.getElementById('container').innerHTML += arr + ",<br>";
               positions.push(arr);
-              console.log(positions);
+
               addMarker(position, resultsMap, "A");
             } else if (status == google.maps.GeocoderStatus.OVER_QUERY_LIMIT) {
               setTimeout(function() {
-                geocodeAddress(address,geocoder,resultsMap);
+                geocodeAddress(address,geocoder,resultsMap,positions,print);
               }, 200);
               // setTimeout("wait = true", 2000);
             }
           });
     //  console.log(positions);
-
     }
     
-    function writeToCSV() {
+    function writeToCSV(positions) {
       var csv = 'street,location\n';
      console.log(positions);
     //  console.log(positions[0]);
@@ -149,6 +151,7 @@
 
 <body>
   <div id="map"></div>
+  <div id="container"></div>
   <!-- <script async defer
   src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAvj4vtNocwxBpiB-UCo2TIL_yOgCvCr6E&libraries=visualization">
 </script> -->
