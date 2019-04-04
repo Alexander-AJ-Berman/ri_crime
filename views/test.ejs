@@ -35,6 +35,7 @@
     // In the following example, markers appear when the user clicks on the map.
     // Each marker is labeled with a single alphabetical character.
     var positions = [];
+    
     let providence = {
         lat: 41.8240,
         lng: -71.4128
@@ -113,9 +114,9 @@
               arr = []
               arr.push(position.lat());
               arr.push(position.lng());
-              console.log(positions);
+            //   console.log(positions);
               positions.push(arr);
-              console.log(positions);
+            //   console.log(positions);
               addMarker(position, resultsMap, "A");
             } else if (status == google.maps.GeocoderStatus.OVER_QUERY_LIMIT) {
               setTimeout(function() {
@@ -130,7 +131,7 @@
     
     function writeToCSV() {
       var csv = 'street,location\n';
-     console.log(positions);
+    //  console.log(positions);
     //  console.log(positions[0]);
       // positions.forEach(function(row) {
       //   csv += row.join(',')
