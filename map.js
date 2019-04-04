@@ -1,4 +1,6 @@
 const express = require('express');
+const fs = require('fs');
+
 const app = express();
 const port = 3000;
 app.set('view engine', 'ejs');
@@ -29,14 +31,20 @@ let Cases = mongoose.model('Cases', caseSchema);
 app.get('/', function(req, res) {
   Cases.find({}, function (err, cases) {
     cases.forEach(function(el) {
+      
       // we need to fix this, this is such a hack!
       str_arr = String(el).match(/\w+|'[^']+'/g);
       let i = str_arr.indexOf("Location");
       address = str_arr[i+1];
-      sample_data.push(address);
+      sample_data.push(address);  
     })
+    render(res);
   })
-  res.render("test.ejs", {data: sample_data});
 });
+
+function render(res) {
+  console.log(sample_data);
+  res.render("test.ejs", {data: sample_data});
+}
 
 app.listen(port, () => console.log('Port 3000...'));

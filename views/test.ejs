@@ -22,36 +22,75 @@
       padding: 0;
     }
   </style>
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAvj4vtNocwxBpiB-UCo2TIL_yOgCvCr6E"></script>
+  <script src="https://requirejs.org/docs/release/2.3.5/minified/require.js"></script>
+ <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAvj4vtNocwxBpiB-UCo2TIL_yOgCvCr6E&libraries=visualization"></script>
   <!-- <script src="map.js"></script> -->
   <script>
+    // const fileSystem = '';
+    // require(['fs'], function(result) {
+    //   fileSystem = result;
+    // });
     let data = "<%= data %>";
     let addresses = String(data).split("&#39;").filter(address => address.length > 2);
     // In the following example, markers appear when the user clicks on the map.
     // Each marker is labeled with a single alphabetical character.
-
-    function initialize() {
-      let providence = {
+    var positions = [];
+    let providence = {
         lat: 41.8240,
         lng: -71.4128
       };
+    function initialize() {
       let map = new google.maps.Map(document.getElementById('map'), {
         zoom: 12,
         center: providence
       });
+
+      heatmap = new google.maps.visualization.HeatmapLayer({
+            data: getPoints(),
+            map: map
+      });
+
       let geocoder = new google.maps.Geocoder();
 
       let arrest_addresses = ["1 Providence Place, Providence, RI", "69 Brown St, Providence, RI"]
       let case_addresses = ["85 Waterman St, Providence, RI"]
+      
+      // var load_addresses = loadAddresses(geocoder, map);
+      // load_addresses.then(() => writeToCSV());
 
-      for (var i = 0; i < addresses.length; i++) {
-        geocodeAddress(addresses[i], geocoder, map, "A")
-      }
       // for (var i = 0; i < case_addresses.length; i++) {
       //   geocodeAddress(case_addresses[i], geocoder, map, "C")
       // }
-
+      loadAddresses(geocoder,map,writeToCSV);
+    
     }
+
+    // function loadAddresses(geocoder, map) {
+      // for (let i = 0; i < 10; i++) {
+      //   geocodeAddress(addresses[i], geocoder, map);
+      // }
+   // }
+   function loadAddresses(geocoder,map, writeToCSV) {
+    for (let i = 0; i < 10; i++) {
+        geocodeAddress(addresses[i], geocoder, map, positions);
+      }
+    writeToCSV();
+   }
+    function getPoints() {
+            console.log(addresses);
+            let maxLat = providence.lat + 0.02;
+            let minLat = providence.lat - 0.02;
+            let maxLon = providence.lng + 0.02;
+            let minLon = providence.lng - 0.02;
+            let arr = [];
+            for (let i = 0; i < 1000; i++) {
+                lat = Math.random() * (maxLat - minLat) + minLat;
+                lon = Math.random() * (maxLon - minLon) + minLon;
+                let point = new google.maps.LatLng(lat, lon);
+                arr.push(point);
+            }
+        return arr;
+      }
 
     // Adds a marker to the map.
     function addMarker(location, map, label) {
@@ -64,24 +103,44 @@
       });
     }
 
-    function geocodeAddress(address, geocoder, resultsMap, label) {
+    function geocodeAddress(address, geocoder, resultsMap, positions) {
+
       // var address = document.getElementById('address').value;
-      geocoder.geocode({
-        'address': address
-      }, function(results, status) {
-        if (status === 'OK') {
-          // resultsMap.setCenter(results[0].geometry.location);
-          position = results[0].geometry.location;
-          addMarker(position, resultsMap, label);
-        } else if (status == google.maps.GeocoderStatus.OVER_QUERY_LIMIT) {
-          wait = true;
-          setTimeout("wait = true", 2000);
-          //alert("OQL: " + status);
-        }
-        // } else {
-        //   alert('Geocode was not successful for the following reason: ' + status);
-        // }
-      });
+          geocoder.geocode({'address': address }, function(results, status) {
+            if (status === 'OK') {
+            // resultsMap.setCenter(results[0].geometry.location);
+              position = results[0].geometry.location;
+              arr = []
+              arr.push(position.lat());
+              arr.push(position.lng());
+              console.log(positions);
+              positions.push(arr);
+              console.log(positions);
+              addMarker(position, resultsMap, "A");
+            } else if (status == google.maps.GeocoderStatus.OVER_QUERY_LIMIT) {
+              setTimeout(function() {
+                geocodeAddress(address,geocoder,resultsMap);
+              }, 200);
+              // setTimeout("wait = true", 2000);
+            }
+          });
+    //  console.log(positions);
+
+    }
+    
+    function writeToCSV() {
+      var csv = 'street,location\n';
+     console.log(positions);
+    //  console.log(positions[0]);
+      // positions.forEach(function(row) {
+      //   csv += row.join(',')
+      //   csv += "\n";
+      // });
+      let hiddenElement = document.createElement('a');
+      hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv);
+      hiddenElement.target = '_blank';
+      hiddenElement.download = 'locations.csv';
+      hiddenElement.click();
     }
 
     google.maps.event.addDomListener(window, 'load', initialize);
@@ -90,6 +149,9 @@
 
 <body>
   <div id="map"></div>
+  <!-- <script async defer
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAvj4vtNocwxBpiB-UCo2TIL_yOgCvCr6E&libraries=visualization">
+</script> -->
 </body>
 
 </html>
