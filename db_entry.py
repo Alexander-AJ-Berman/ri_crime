@@ -24,6 +24,13 @@ def add_arrest_to_case(case_num: str, statute_code: str, arrest, db_cases):
 
 
 def print_case(case_num: str, statute_code: str, db_cases):
+    """
+
+    :param case_num:
+    :param statute_code:
+    :param db_cases:
+    :return:
+    """
     query = {"CaseNumber": case_num,
              "Statute Code": statute_code}
     print(db_cases.find_one(query))
@@ -40,6 +47,34 @@ def combine_arrests_cases_db(db_arrests, db_cases):
         case_num = arrest["Case Number"]
         statute_code = arrest["Statute Code"]
         add_arrest_to_case(case_num, statute_code, arrest, db_cases)
+
+
+def get_num_arrests_in_cases(db_cases):
+    num_total_cases = db_cases.find().count()
+    num_not_arrests = db_cases.find({"Arrests": []}).count()
+    num_arrests = num_total_cases - num_not_arrests
+    return {"num_total_cases": num_total_cases,
+            "num_not_arrests": num_not_arrests,
+            "num_arrests": num_arrests}
+
+
+def assert_case_num_statute_code_UID(db):
+    """
+    Assertion to make sure cases are actually UID'd by case number and statute code
+    :param db: probably want this to be db_cases
+    :return: Number of cases
+    """
+    case_num_statute_code_set = set()
+    for entry in db.find():
+        id = (entry["CaseNumber"], entry["Statute Code"])
+        if id in case_num_statute_code_set:
+            print(entry)
+            # DELETE ENTRY
+            # db.delete_one(entry)
+        case_num_statute_code_set.add(id)
+
+    assert len(case_num_statute_code_set) == db.find().count()
+    return len(case_num_statute_code_set)
 
 
 def main():
@@ -68,8 +103,13 @@ def main():
     # COMBINE ARRESTS AND CASES
     # combine_arrests_cases_db(db_arrests, db_cases)
 
+    # print cases:
+    # a = db_cases.find({"CaseNumber": "2018-00133531"})
+    # for i in a:
+    #     print(i)
 
-    # TODO: write an assert to make sure cases are actually UID'd by case number and statute code
+    # print(get_num_arrests_in_cases(db_cases))
+    print(assert_case_num_statute_code_UID(db_cases))
 
 
 if __name__ == "__main__":
