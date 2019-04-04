@@ -2,7 +2,7 @@ const express = require('express');
 const fs = require('fs');
 
 const app = express();
-const port = 3000;
+const port = 3002;
 app.set('view engine', 'ejs');
 var mongoose = require('mongoose');
 
@@ -43,7 +43,6 @@ app.get('/', function(req, res) {
 });
 
 function render(res) {
-  console.log(sample_data);
   res.render("test.ejs", {data: sample_data});
 }
 
