@@ -109,8 +109,9 @@ def main():
     #     print(i)
 
     # print(get_num_arrests_in_cases(db_cases))
-    print(assert_case_num_statute_code_UID(db_cases))
-
+    # print(assert_case_num_statute_code_UID(db_cases))
+    for i in db_cases.find():
+        print(i)
 
 if __name__ == "__main__":
     main()

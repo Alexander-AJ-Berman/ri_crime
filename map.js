@@ -2,7 +2,7 @@ const express = require('express');
 const fs = require('fs');
 
 const app = express();
-const port = 3002;
+const port = 3000;
 app.set('view engine', 'ejs');
 var mongoose = require('mongoose');
 
