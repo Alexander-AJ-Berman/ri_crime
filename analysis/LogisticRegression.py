@@ -36,9 +36,13 @@ TODOs:
         # when considering arrests, experiment with how number of arrests 
         #  per case affects our input data
     output: data = num_cases x (num_features + 1) matrix 
+
+    - Jeff 
+    
 3. LogisticRegression.train(data)
     a. class_weight = balanced
 4. Get new data, put in db as db_test_cases, db_test_arrests
+    - Kevin
 5. LogisticRegression.train(test_data)
 6. Analyze results:
     a. Make precision-recall graph

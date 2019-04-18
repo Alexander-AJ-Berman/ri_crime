@@ -77,6 +77,13 @@ def assert_case_num_statute_code_UID(db):
     return len(case_num_statute_code_set)
 
 
+def add_case_data_to_db(cases_db, csv_path):
+    cases_data = pd.read_csv(csv_path)
+    json_data = json.loads(cases_data.to_json(orient='records'))
+    for case in json_data:
+        print(case)
+    # cases_db.find({"CaseNumber": })
+
 def main():
     client = MongoClient(uri)
 
@@ -84,11 +91,11 @@ def main():
     db_cases = db['cases']
     db_arrests = db['arrests']
 
-    case_data = pd.read_csv("./PPCL_180days.csv")
-    arrest_data = pd.read_csv("./PPAL_60days.csv")
+    case_data = pd.read_csv("../data/cases_new.csv")
+    arrest_data = pd.read_csv("../data/arrests_new.csv")
 
-    case_json = json.loads(case_data.to_json(orient='records'))
-    arrest_json = json.loads(arrest_data.to_json(orient='records'))
+    # case_json = json.loads(case_data.to_json(orient='records'))
+    # arrest_json = json.loads(arrest_data.to_json(orient='records'))
 
     # CREATE ARRESTS TABLE
     # db_arrests.insert_many(arrest_json)
