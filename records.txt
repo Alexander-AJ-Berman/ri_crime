@@ -1,0 +1,6 @@
+Adding new data to db 4/18/19
+Steps:
+1. download new data
+2. merge new data with db
+3. remove old arrests field from cases
+4. readd all arrests
