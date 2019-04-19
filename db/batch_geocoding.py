@@ -17,6 +17,7 @@ import pandas as pd
 import requests
 import logging
 import time
+from pymongo import MongoClient
 
 logger = logging.getLogger("root")
 logger.setLevel(logging.DEBUG)
@@ -37,7 +38,7 @@ API_KEY = 'AIzaSyAvj4vtNocwxBpiB-UCo2TIL_yOgCvCr6E'
 # Backoff time sets how many minutes to wait between google pings when your API limit is hit
 BACKOFF_TIME = 30
 # Set your output file name here.
-output_filename = 'data/case_address_lat_lng.csv'
+output_filename = 'data/new_cases.csv'
 # Set your input file here
 input_filename = "data/case_addresses.txt"
 # Specify the column name in your input data that contains addresses here
@@ -64,11 +65,22 @@ RETURN_FULL_RESULTS = False
 addresses = []
 old_addresses = []
 
-with open(input_filename) as f:
-    content = f.readlines()
-    for line in content:
-        old_addresses.append(line.split(";")[0])
-        addresses.append(line.split(";")[0] + " Providence, RI")
+uri = 'mongodb://user:password1@ds159025.mlab.com:59025/ri_crime_data'
+client = MongoClient(uri)
+
+db = client.get_database()
+db_cases = db['cases']
+
+for case in db_cases.find():
+    if "latitude" not in case.keys() and str(case['Location']) not in addresses:
+        old_addresses.append(str(case['Location']))
+        addresses.append(str(case['Location']) + ", Providence, RI")
+
+# with open(input_filename) as f:
+#     content = f.readlines()
+#     for line in content:
+#         old_addresses.append(line.split(";")[0])
+#         addresses.append(line.split(";")[0] + " Providence, RI")
 
 
 #------------------	FUNCTION DEFINITIONS ------------------------

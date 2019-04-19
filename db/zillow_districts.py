@@ -23,9 +23,7 @@ def main():
     db_arrests = db['arrests']
     db_postdata = db['postcode_data']
 
-    case_data = pd.read_csv("./PPCL_180days.csv")
-
-    case_json = json.loads(case_data.to_json(orient='records'))
+    # case_json = json.loads(case_data.to_json(orient='records'))
 
     key = "X1-ZWz1h0tux20p3f_29gz1"
 
@@ -34,7 +32,69 @@ def main():
     count = 0
     num_searching = db_cases.count({"Arrests": {"$ne": []}})
     zips = []
-    print(client.list_database_names())
+
+    for i in db_cases.find():
+        count += 1
+
+
+    print(count)
+
+    # with open("data/postcode_data.txt") as f:
+    #     s = f.readlines()
+    #     megaS = ""
+    #     for item in s:
+    #         megaS = megaS + item
+    #     arr = megaS.split("STARTING A NEW ZIP CODE\n")[1:]
+    #
+    #     for zip_data in arr:
+    #         internal_arr = zip_data.split("\n")
+    #         zipcode = internal_arr[0]
+    #         print(zipcode)
+    #         internal_data = {}
+    #         internal_data["Postcode"] = zipcode
+    #         for index, datapoint in enumerate(internal_arr):
+    #             if datapoint == "Average Commute Time (Minutes)":
+    #                 internal_data["Avg_commute_time"] = float(internal_arr[index+1])
+    #             elif datapoint == "Average Household Size":
+    #                 internal_data["Avg_household_size"] = float(internal_arr[index+1])
+    #             elif datapoint == "Median Age":
+    #                 internal_data["Median_age"] = float(internal_arr[index+1])
+    #             elif datapoint == "Homes With Kids":
+    #                 internal_data["Homes_with_kids"] = float(internal_arr[index+1])
+    #             elif datapoint == "Owners":
+    #                 internal_data["Owners"] = float(internal_arr[index+1])
+    #             elif datapoint == "Renters":
+    #                 internal_data["Renters"] = float(internal_arr[index+1])
+    #             elif datapoint == "Median Household Income":
+    #                 internal_data["Median_household_income"] = float(internal_arr[index+1])
+    #         # d[zipcode] = internal_data
+    #         db_postdata.insert(internal_data)
+
+    # data = pd.read_csv("data/new_cases.csv", encoding='utf8')
+    # accuracy = data["accuracy"].tolist()
+    # database_address = data["database_address"].tolist()
+    # new_database_address = [str(address).strip().upper() for address in database_address]
+    #
+    # formatted_address = data["formatted_address"].tolist()
+    # google_place_id = data["google_place_id"].tolist()
+    # latitude = data["latitude"].tolist()
+    # longitude = data["longitude"].tolist()
+    # postcode = data["postcode"].tolist()
+    # type = data["type"].tolist()
+    #
+    # for i in db_cases.find():
+    #     id = i["_id"]
+    #     if "latitude" not in i.keys() and "Location" in i.keys() and i["Location"] and i["Location"].strip().upper() in new_database_address:
+    #         addy = i['Location'].strip().upper()
+    #         if addy in new_database_address:
+    #             print(addy)
+    #             list_index = new_database_address.index(addy)
+    #             db_cases.update({"_id" :id },{"$set" : {"formatted_address": formatted_address[list_index],"google_place_id":google_place_id[list_index],
+    #                 "latitude": latitude[list_index], "longitude": longitude[list_index], "postcode": postcode[list_index], "type": type[list_index]} })
+    #         else:
+    #             print("u fucked up")
+
+
 
 
     # db.collection.insert("postcode_data", {"Avg_commute_time": "<float>", "Avg_household_size": "<float>", "Median_age": "<float>", "Median_household_income": "<float>", "Percent_renters": "<float>", "Percent_owners": "<float>"})
