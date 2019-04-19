@@ -13,6 +13,7 @@ from sklearn.metrics import precision_recall_curve
 import matplotlib.pyplot as plt
 from sklearn.utils.fixes import signature
 from sklearn.metrics import confusion_matrix
+import math
 
 uri = 'mongodb://user:password1@ds159025.mlab.com:59025/ri_crime_data'
 
@@ -50,6 +51,8 @@ def clean_data(data):
     labels = []
     officers = get_officers(data)
     statute_codes = get_statute_codes()
+    types = get_types()
+    districts = get_districts()
     for row in data:
         tmp = []
         tmp.append(row['Month'])
@@ -60,6 +63,8 @@ def clean_data(data):
         tmp.append(row['Counts'])
         tmp.append(row['latitude'])
         tmp.append(row['longitude'])
+        tmp.append(convert_type(row['type'],types))
+        tmp.append(convert_district(row['zillow_district_id'],districts))
         ml_data.append(tmp)
         if row['Arrests'] != []:
             labels.append(1)
@@ -107,6 +112,15 @@ def convert_statute_code(statute,statutes):
     # return np.array(one_hot_vector)
     return statutes[statute[:4]]
 
+def convert_type(property_type,types):
+    return types[property_type]
+
+def convert_district(district,districts):
+    if math.isnan(float(district)):
+        return -1
+    else: 
+        return districts[district]
+
 def get_statute_codes():
     statute_codes = set()
     for case in db_cases.find():
@@ -120,6 +134,29 @@ def get_statute_codes():
         statute_dict[code] = num
         num += 1
     return statute_dict
+
+def get_types():
+    types = set()
+    for case in db_cases.find():
+        types.add(case['type'])
+    types_dict = {}
+    num = 0
+    for t in types:
+        types_dict[t] = num
+        num += 1
+    return types_dict
+
+def get_districts():
+    districts = set()
+    for case in db_cases.find():
+        if 'zillow_district_id' in case:
+            districts.add(case['zillow_district_id'])
+    districts_dict = {}
+    num = 0
+    for district in districts:
+        districts_dict[district] = num
+        num += 1
+    return districts_dict
 
 """
 TODOs:
@@ -203,10 +240,11 @@ def type_1_2_errors(model, X_test, y_test):
     return {"False positive": FP, "False negative": FN}
 
 def main():
-    df = mongo_to_df()
-    data = convert_data(df)
-    ml_data, labels = clean_data(data)
-    train_and_test(ml_data, labels)
-    # print(ml_data[0])
+    for i in range(10):
+        df = mongo_to_df()
+        data = convert_data(df)
+        ml_data, labels = clean_data(data)
+        train_and_test(ml_data, labels)
+
 if __name__ == "__main__":
     main()
