@@ -60,10 +60,9 @@ def clean_data(data):
         tmp.append(row['Counts'])
         tmp.append(row['latitude'])
         tmp.append(row['longitude'])
-        ml_data.append(np.array(tmp))
+        ml_data.append(tmp)
         if row['Arrests'] != []:
             labels.append(1)
-            print(row['Arrests'])
         else:
             labels.append(0)
 
@@ -92,18 +91,21 @@ def convert_to_day_of_the_week(date):
     split_date = date.split()[0]
     split_date = split_date.split('/')
     day_of_the_week = datetime.datetime(int(split_date[2]),int(split_date[0]),int(split_date[1])).weekday()
-    one_hot_vector[day_of_the_week] = 1
-    return one_hot_vector
+    # one_hot_vector[day_of_the_week] = 1
+    # return np.array(one_hot_vector)
+    return day_of_the_week
 
 def convert_reporting_officer(officer,officers):
     one_hot_vector = [0] * len(officers.keys())
     one_hot_vector[officers[officer]] = 1
-    return one_hot_vector
+    # return np.array(one_hot_vector)
+    return officers[officer]
 
 def convert_statute_code(statute,statutes):
     one_hot_vector = [0] * len(statutes.keys())
     one_hot_vector[statutes[statute[:4]]] = 1
-    return one_hot_vector
+    # return np.array(one_hot_vector)
+    return statutes[statute[:4]]
 
 def get_statute_codes():
     statute_codes = set()
@@ -205,5 +207,6 @@ def main():
     data = convert_data(df)
     ml_data, labels = clean_data(data)
     train_and_test(ml_data, labels)
+    # print(ml_data[0])
 if __name__ == "__main__":
     main()
