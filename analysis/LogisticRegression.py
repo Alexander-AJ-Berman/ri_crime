@@ -5,6 +5,9 @@ import sys, getopt, pprint
 import pymongo
 from pymongo import MongoClient
 import datetime
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
+
 
 uri = 'mongodb://user:password1@ds159025.mlab.com:59025/ri_crime_data'
 
@@ -137,6 +140,28 @@ TODOs:
     a. Make precision-recall graph
 
 """
+
+
+def train_and_test(X, y):
+    """
+    Method to train and test on our data!
+    :param X: pandas df of the features
+    :param y: some form of a list/nparray/df of the labels, ordered in the same way as X
+    :return: the accuracy/score of the model!
+    """
+    X_train, X_test, y_train, y_test = train_test_split(
+        X,
+        y,
+        test_size=0.1,
+        train_size=0.9,
+        random_state=0,
+        shuffle=True
+    )
+
+    model = LogisticRegression().fit(X_train, y_train)
+    score = model.score(X_test, y_test)
+    print("Score:", score)
+    return score
 
 def main():
     df = mongo_to_df()
