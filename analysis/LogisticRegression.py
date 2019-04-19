@@ -7,6 +7,7 @@ from pymongo import MongoClient
 import datetime
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
+import numpy as np
 
 
 uri = 'mongodb://user:password1@ds159025.mlab.com:59025/ri_crime_data'
@@ -55,14 +56,14 @@ def clean_data(data):
         tmp.append(row['Counts'])
         tmp.append(row['latitude'])
         tmp.append(row['longitude'])
-        ml_data.append(tmp)
+        ml_data.append(np.array(tmp))
         if row['Arrests'] != []:
             labels.append(1)
             print(row['Arrests'])
         else:
             labels.append(0)
 
-    return ml_data, labels
+    return np.array(ml_data), np.array(labels)
 
 def get_officers(data):
     officers = set()
@@ -167,6 +168,6 @@ def main():
     df = mongo_to_df()
     data = convert_data(df)
     ml_data, labels = clean_data(data)
-
+    train_and_test(ml_data, labels)
 if __name__ == "__main__":
     main()
