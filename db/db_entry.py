@@ -120,7 +120,7 @@ def main():
     # print("combining arrests, cases")
     # combine arrest, case data
 
-    combine_arrests_cases_db(db_arrests, db_cases)
+    # combine_arrests_cases_db(db_arrests, db_cases)
 
     # reset arrests for each case
     # del_all_arrests_from_cases(db_cases)
