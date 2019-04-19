@@ -8,7 +8,11 @@ import datetime
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 import numpy as np
-
+from sklearn.metrics import average_precision_score
+from sklearn.metrics import precision_recall_curve
+import matplotlib.pyplot as plt
+from sklearn.utils.fixes import signature
+from sklearn.metrics import confusion_matrix
 
 uri = 'mongodb://user:password1@ds159025.mlab.com:59025/ri_crime_data'
 
@@ -162,7 +166,39 @@ def train_and_test(X, y):
     model = LogisticRegression().fit(X_train, y_train)
     score = model.score(X_test, y_test)
     print("Score:", score)
+    print(type_1_2_errors(model, X_test, y_test))
+    precision_recall(model, X_test, y_test)
+
     return score
+
+def precision_recall(model, X_test, y_test):
+    y_score = model.decision_function(X_test)
+    average_precision = average_precision_score(y_test, y_score)
+    print('Average precision-recall score: {0:0.2f}'.format(
+        average_precision))
+    precision, recall, _ = precision_recall_curve(y_test, y_score)
+
+    # In matplotlib < 1.5, plt.fill_between does not have a 'step' argument
+    step_kwargs = ({'step': 'post'}
+                   if 'step' in signature(plt.fill_between).parameters
+                   else {})
+    plt.step(recall, precision, color='b', alpha=0.2,
+             where='post')
+    plt.fill_between(recall, precision, alpha=0.2, color='b', **step_kwargs)
+
+    plt.xlabel('Recall')
+    plt.ylabel('Precision')
+    plt.ylim([0.0, 1.05])
+    plt.xlim([0.0, 1.0])
+    plt.title('2-class Precision-Recall curve: AP={0:0.2f}'.format(
+              average_precision))
+
+def type_1_2_errors(model, X_test, y_test):
+    preds = model.predict(X_test)
+    FP = confusion_matrix(y_test, preds)[0][1]
+    FN = confusion_matrix(y_test, preds)[1][0]
+
+    return {"False positive": FP, "False negative": FN}
 
 def main():
     df = mongo_to_df()
