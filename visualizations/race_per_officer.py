@@ -36,16 +36,32 @@ for arrest in arrests:
                                 ethnicity_lst.append(ethnicity.strip())
 
 
-labels = ['White', 'Black', 'Unknown', 'Asian/Pacific Islander', 'American Indian/Alaskan Native', 'ZHispanic (FD only)']
-sizes = [Counter(race_lst)[el] for el in Counter(race_lst)]
 
-fig1, ax1 = plt.subplots()
-ax1.pie(sizes, labels=labels)
-ax1.axis('equal')
-plt.legend(loc="upper left")
+#c = Counter([x.encode('ascii') for x in ethnicity_lst])
+
+# print(len(officer_lst))
+# print(len(race_lst))
 
 
-plt.show()
 
-# Racial arrests by total, normalize pie chart
-        
+
+
+# labels = ['Hispanic', 'NonHispanic', 'Unknown']
+# sizes = [c[label] for label in labels]
+# colors = ['#ff9999','#66b3ff','#99ff99']
+# explode = [.02, .02, .01]
+
+# fig1, ax1 = plt.subplots()
+# patches, texts, autotexts = ax1.pie(sizes,colors=colors, labels=labels, autopct='%1.1f%%',explode=explode, pctdistance=.85, startangle=-45)
+# center_circle = plt.Circle((0,0), 0.70, fc='white')
+# fig = plt.gcf()
+# fig.gca().add_artist(center_circle)
+
+# for text in texts:
+#         text.set_weight('bold')
+# for autotext in autotexts:
+#         autotext.set_weight('bold')
+# ax1.axis('equal')
+# plt.tight_layout()
+# plt.title('Ethnic Breakdown of Arrests as Reported by PPD')
+# plt.show()
