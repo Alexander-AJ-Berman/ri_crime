@@ -82,25 +82,3 @@ plt.ylabel("Total Arrests", fontdict = {'fontsize' : 12})
 plt.title("Racial Breakdown of Individual Arrests by Officer (Jan 2019 - April 2019)", fontdict = {'fontsize' : 18})
 plt.legend(races, loc='best')
 plt.show()
-
-
-
-
-#sizes = [c[label] for label in labels]
-# colors = ['#ff9999','#66b3ff','#99ff99']
-# explode = [.02, .02, .01]
-
-# fig1, ax1 = plt.subplots()
-# patches, texts, autotexts = ax1.pie(sizes,colors=colors, labels=labels, autopct='%1.1f%%',explode=explode, pctdistance=.85, startangle=-45)
-# center_circle = plt.Circle((0,0), 0.70, fc='white')
-# fig = plt.gcf()
-# fig.gca().add_artist(center_circle)
-
-# for text in texts:
-#         text.set_weight('bold')
-# for autotext in autotexts:
-#         autotext.set_weight('bold')
-# ax1.axis('equal')
-# plt.tight_layout()
-# plt.title('Ethnic Breakdown of Arrests as Reported by PPD')
-# plt.show()
