@@ -79,6 +79,6 @@ plt.bar(x_pos, unknown_size, width = 0.8, label='Unknown', color=colors[4], bott
 plt.xticks(x_pos, labels)
 plt.xlabel("Officer # (Names Redacted)", fontdict = {'fontsize' : 12})
 plt.ylabel("Total Arrests", fontdict = {'fontsize' : 12})
-plt.title("Racial Breakdown of Individual Arrests by Officer (Jan 2019 - April 2019)", fontdict = {'fontsize' : 18})
+plt.title("Racial Breakdown of Individual Arrests by Officer (Jan 2019 - April 2019)", fontdict = {'fontsize' : 24})
 plt.legend(races, loc='best')
 plt.show()
