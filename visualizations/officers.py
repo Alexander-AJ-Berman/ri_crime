@@ -4,22 +4,48 @@ slice of X = (# of arrests of ethnicity X)/(total # of arrests),
 where each officer has their own chart
 """
 
+from pymongo import MongoClient
+from collections import Counter
+import itertools
+import matplotlib.pyplot as plt
 
-def pie_one_officer(officer, db_arrests):
-    """
-    Method that, given an officer and the arrests database
-    :param officer: a string representing name of the officer
-    :param db_arrests: arrests db
-    :return:
-    """
+uri = 'mongodb://user:password1@ds159025.mlab.com:59025/ri_crime_data'
 
-    # 1. officer_arrests = Get all arrests from db_arrests by officer
-    # 2. Count # arrests of each race/ethnicity in officer_arrests
-    # 3. pie chart that
+client = MongoClient(uri)
+db = client.get_database()
+db_arrests = db['arrests']
+arrests = db_arrests.find()
 
-def pie_all_officers():
-    # 1. get list of all officer names
+officer_lst = []
+race_lst = []
+ethnicity_lst = []
 
-    # 2. iterate through
-    for officer in officer_list:
-        pie_one_officers(officer, db_arrests)
+for arrest in arrests:
+        officers = arrest["Arresting Officers"]
+        race = arrest["Race"]
+        ethnicity = arrest["Ethnicity"]
+        
+        if officers != None:
+                # Remove leading and trailing whitespace
+                officers = officers.split(',')
+                
+                for officer in officers:
+                        if officer != None and race != None and ethnicity != None:
+                                officer_lst.append(officer.strip())
+                                race_lst.append(race.strip())
+                                ethnicity_lst.append(ethnicity.strip())
+
+
+labels = ['White', 'Black', 'Unknown', 'Asian/Pacific Islander', 'American Indian/Alaskan Native', 'ZHispanic (FD only)']
+sizes = [Counter(race_lst)[el] for el in Counter(race_lst)]
+
+fig1, ax1 = plt.subplots()
+ax1.pie(sizes, labels=labels)
+ax1.axis('equal')
+plt.legend(loc="upper left")
+
+
+plt.show()
+
+# Racial arrests by total, normalize pie chart
+        
