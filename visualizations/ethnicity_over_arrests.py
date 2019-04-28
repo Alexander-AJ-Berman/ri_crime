@@ -46,5 +46,5 @@ for autotext in autotexts:
         autotext.set_weight('bold')
 ax1.axis('equal')
 plt.tight_layout()
-plt.title('Ethnic Breakdown of Arrests as Reported by PPD (Jan 2019 - April 2019)')
+plt.title('Ethnic Breakdown of Arrests as Reported by PPD (Jan 2019 - April 2019)', fontdict = {'fontsize' : 18})
 plt.show()
