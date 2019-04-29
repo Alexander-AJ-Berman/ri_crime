@@ -3,6 +3,7 @@ from pymongo import MongoClient
 import datetime
 from sklearn.linear_model import LogisticRegression
 from sklearn.decomposition import TruncatedSVD
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.svm import SVC
 from sklearn.model_selection import train_test_split
 import numpy as np
@@ -84,13 +85,13 @@ def clean_data(data):
     feature_list.append("lon")
     feature_list.append("type")
     for month in months:
-        feature_list.append(month)
+        feature_list.append(calendar.month_name[month])
     for i in range(7):
         feature_list.append(calendar.day_abbr[i])
     for sc in statute_codes:
-        feature_list.append(sc)
+        feature_list.append(f"sc:{sc}")
     for i in range(len(officers.keys())):
-        feature_list.append(f"{i}")
+        feature_list.append(f"officer{i}")
     for zc in zip_codes:
         feature_list.append(zc)
 
@@ -298,7 +299,13 @@ def plot_coefs_std(std_coef, feature_list, feature_dict):
     # sns.barplot(feature_list, std_coef)
     # plt.xticks(rotation=90)
     # plt.show()
-
+    sns.barplot([feature_list[i] for i in range(0, len(feature_list)) if np.abs(std_coef[i]) > 0.1],
+                [std_coef[i] for i in range(0, len(feature_list)) if np.abs(std_coef[i]) > 0.1])
+    plt.xticks(rotation=90)
+    plt.title("Weights across most significant features", fontsize=22)
+    plt.xlabel("Feature")
+    plt.ylabel("coef * std")
+    plt.show()
     # plot all zipcodes
     sns.barplot(feature_list[feature_dict["zc"][0]:feature_dict["zc"][1]],
                 std_coef[feature_dict["zc"][0]:feature_dict["zc"][1]])
@@ -342,6 +349,7 @@ def plot_coefs_std(std_coef, feature_list, feature_dict):
     plt.title("Weights across officer features (one-hot)", fontsize=22)
     plt.xlabel("Officer")
     plt.ylabel("coef * std")
+    plt.xticks([])
     plt.show()
 
 def train_and_test(X, y, feature_list, feature_dict):
@@ -366,18 +374,18 @@ def train_and_test(X, y, feature_list, feature_dict):
     # X_test, y_test = balance(X_test, y_test)
 
     class_weights = {0: 0.9, 1: 0.1}
-    model = LogisticRegression(random_state=0).fit(X_train, y_train)
+    model = RandomForestClassifier(random_state=0).fit(X_train, y_train)
     # print("coefs:", model.coef_)
-    std_coef = (np.std(X_train, 0) * model.coef_)[0]
-    print(len(std_coef))
-    print(len(feature_list))
-    print("coefs * std max:", np.argmax(np.std(X_train, 0) * model.coef_))
-    print("coefs * std min:", np.argmin(np.std(X_train, 0) * model.coef_))
+    # std_coef = (np.std(X_train, 0) * model.coef_)[0]
+    # print(len(std_coef))
+    # print(len(feature_list))
+    # print("coefs * std max:", np.argmax(np.std(X_train, 0) * model.coef_))
+    # print("coefs * std min:", np.argmin(np.std(X_train, 0) * model.coef_))
 
-    plot_coefs_std(std_coef, feature_list, feature_dict)
-    sns.barplot(feature_list, std_coef)
-    plt.xticks(rotation=90)
-    plt.show()
+    # plot_coefs_std(std_coef, feature_list, feature_dict)
+    # sns.barplot(feature_list, std_coef)
+    # plt.xticks(rotation=90)
+    # plt.show()
     score = model.score(X_test, y_test)
     print("Score:", score)
     type12errs = type_1_2_errors(model, X_test, y_test)
