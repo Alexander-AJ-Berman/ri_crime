@@ -38,6 +38,7 @@ def mongo_to_df():
 def convert_data(df):
     data = []
     columns = df.columns;
+    print(columns)
     for index, row in df.iterrows():
         tmp = {}
         for col in columns:
@@ -53,6 +54,8 @@ def clean_data(data):
     statute_codes = get_statute_codes()
     types = get_types()
     districts = get_districts()
+    numArrests = 0
+    numCases = 0
     for row in data:
         tmp = []
         tmp.append(row['Month'])
@@ -68,8 +71,12 @@ def clean_data(data):
         ml_data.append(tmp)
         if row['Arrests'] != []:
             labels.append(1)
+            numArrests += 1
         else:
             labels.append(0)
+            numCases += 1
+    print(numArrests)
+    print(numCases)
 
     return np.array(ml_data), np.array(labels)
 
@@ -240,11 +247,11 @@ def type_1_2_errors(model, X_test, y_test):
     return {"False positive": FP, "False negative": FN}
 
 def main():
-    for i in range(10):
-        df = mongo_to_df()
-        data = convert_data(df)
-        ml_data, labels = clean_data(data)
-        train_and_test(ml_data, labels)
+ #   for i in range(10):
+    df = mongo_to_df()
+    data = convert_data(df)
+    ml_data, labels = clean_data(data)
+    train_and_test(ml_data, labels)
 
 if __name__ == "__main__":
     main()
