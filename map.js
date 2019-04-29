@@ -25,24 +25,31 @@ let caseSchema = new mongoose.Schema({
   "Statute Code": String,
   "Statute Desc": String,
   "Counts": String,
-  "Reporting Officer": String
+  "Reporting Officer": String,
 })
-
 let Cases = mongoose.model('Cases', caseSchema);
 app.get('/', function(req, res) {
   Cases.find({}, function (err, cases) {
     cases.forEach(function(el) {
-
-      // we need to fix this, this is such a hack!
-      str_arr = String(el).match(/\w+|'[^']+'/g);
-      let i = str_arr.indexOf("Location");
-      address = str_arr[i+1];
-      let j = str_arr.indexOf("Arrests");
-      let x = "A";
-      if (!str_arr[j+1]) {
-        x = "C";
+      row = String(el).match(/\w+|'[^']+'/g);
+      let latitude = parseInt(row[row.indexOf("latitude")+1])
+      let longitude = parseInt(row[row.indexOf("longitude")+1])
+      let latdecimal = row[row.indexOf("latitude")+2]
+      let londecimal = row[row.indexOf("longitude")+2]
+      while (latdecimal > 1) {
+        latdecimal /= 10
       }
-      sample_data.push(address + x);
+      latitude += latdecimal
+      while (londecimal > 1) {
+        londecimal /= 10
+      }
+      longitude += londecimal
+      longitude = (-1)*longitude
+      let isArrest = false
+      if (row[row.indexOf("Arrests")+1] == "_id") {
+        isArrest = true
+      }
+      sample_data.push([parseFloat(latitude),parseFloat(longitude),isArrest])
     })
     render(res);
   })

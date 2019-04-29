@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from pymongo import MongoClient
 import matplotlib.patches as mpatches
+import math
 
 def plot_month(db_cases):
     """
@@ -138,6 +139,91 @@ def plot_time_of_day(db_cases):
 
     plt.savefig("../visualization_output/arrests_cases_by_time_of_day.png")
 
+def plot_median_income(db_cases, db_postcodes):
+    """
+    x-axis: each hour
+    y-axis: num_cases, num_arrests (2 separate lines, double y-axis)
+    :param db_cases: cases
+    :return: stacked bar chart
+    """
+    home_values = {}
+    zipcodes_to_incomes = {}
+
+    for i in db_postcodes.find():
+        zipcodes_to_incomes[i["Postcode"]] = i["Zillow Home Value Index"]
+
+    for i in db_cases.find():
+        if i["postcode"] in zipcodes_to_incomes.keys():
+            home_value = zipcodes_to_incomes[i["postcode"]]
+        if home_value is not None:
+            rounded_home_value = "<$210k"
+            if home_value > 250000:
+                rounded_home_value = "$250k+"
+            elif home_value > 225000:
+                rounded_home_value = "$225k - $255k"
+            elif home_value > 210000:
+                rounded_home_value = "$210k - $225k"
+            # rounded_home_value = math.floor(home_value / 100000.0) * 100000.0
+            caseNumber = i['CaseNumber']
+
+            if rounded_home_value in home_values.keys():
+                d = home_values[rounded_home_value]
+                newCases = d['Cases']
+                newCases.append(caseNumber)
+                d['Cases'] = newCases
+                home_values[rounded_home_value] = d
+            else:
+                d = {}
+                d['Cases'] = [caseNumber]
+                d['Arrests'] = []
+                home_values[rounded_home_value] = d
+
+            if i['Arrests'] != []:
+                d = home_values[rounded_home_value]
+                newArrest = d['Arrests']
+                newArrest.append(caseNumber)
+                d['Arrests'] = newArrest
+                home_values[rounded_home_value] = d
+
+    numCases = []
+    numArrests = []
+    homevals = []
+
+    for homeval, dayData in home_values.items():
+        homevals.append(homeval)
+        numCases.append(len(set(dayData['Cases'])))
+        numArrests.append(len(set(dayData['Arrests'])))
+
+    together = zip(homevals, numCases)
+    sorted_together = sorted(together)
+    homevalssorted = [x[0] for x in sorted_together]
+    numCasesSorted = [x[1] for x in sorted_together]
+
+    together1 = zip(homevals, numArrests)
+    sorted_together1 = sorted(together1)
+    numArrestsSorted = [x[1] for x in sorted_together1]
+
+    homevalssorted = [homevalssorted[-1]] + homevalssorted[:-1]
+    numArrestsSorted = [numArrestsSorted[-1]] + numArrestsSorted[:-1]
+    numCasesSorted = [numCasesSorted[-1]] + numCasesSorted[:-1]
+
+    N = len(home_values.keys())
+    ind = np.arange(N)    # the x locations for the groups
+    width = 0.35       # the width of the bars: can also be len(x) sequence
+
+    p1 = plt.bar(ind, numCasesSorted, width)
+    p2 = plt.bar(ind, numArrestsSorted, width,
+                 bottom=numCasesSorted)
+
+    plt.ylabel('Number of Cases')
+    plt.title('Number of Cases and Arrests By Average Area Home Value')
+    plt.xticks(ind, homevalssorted)
+    blue_patch = mpatches.Patch(color='blue', label='Cases')
+    orange_patch = mpatches.Patch(color='orange', label='Arrests')
+    plt.legend(handles=[blue_patch, orange_patch])
+
+    plt.savefig("../visualization_output/median_home_values.png")
+
 
 def plot_every_day(db_cases):
     """
@@ -223,10 +309,12 @@ def main():
     client = MongoClient(uri)
     db = client.get_database()
     db_cases = db['cases']
+    db_postcodes = db['postcode_data']
 
     # plot_month(db_cases) #done
     # plot_time_of_day(db_cases) #done
-    plot_every_day(db_cases)
+    # plot_every_day(db_cases)
+    plot_median_income(db_cases, db_postcodes)
 
 if __name__ == "__main__":
     main()

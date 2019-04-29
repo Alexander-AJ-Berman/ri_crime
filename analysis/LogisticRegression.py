@@ -75,6 +75,7 @@ def clean_data(data):
         ml_data.append(tmp)
         if row['Arrests'] != []:
             labels.append(1)
+            numArrests += 1
         else:
             labels.append(0)
     feature_list = []
