@@ -305,7 +305,8 @@ def plot_every_day(db_cases):
     plt.savefig("../visualization_output/arrests_cases_each_day.png")
 
 def main():
-    uri = 'mongodb://user:password1@ds159025.mlab.com:59025/ri_crime_data'
+    import os
+uri = os.environ['DB']
     client = MongoClient(uri)
     db = client.get_database()
     db_cases = db['cases']

@@ -1,4 +1,6 @@
 """
+TAKEN AND MODIFIED FROM: https://gist.github.com/shanealynn/033c8a3cacdba8ce03cbe116225ced31
+
 Python script for batch geocoding of addresses using the Google Geocoding API.
 This script allows for massive lists of addresses to be geocoded for free by pausing when the
 geocoder hits the free rate limit set by Google (2500 per day).  If you have an API key for paid
@@ -18,6 +20,7 @@ import requests
 import logging
 import time
 from pymongo import MongoClient
+import os
 
 logger = logging.getLogger("root")
 logger.setLevel(logging.DEBUG)
@@ -33,8 +36,7 @@ logger.addHandler(ch)
 # With API_KEY = None, you will run into a 2 second delay every 10 requests or so.
 # With a "Google Maps Geocoding API" key from https://console.developers.google.com/apis/,
 # the daily limit will be 2500, but at a much faster rate.
-# Example: API_KEY = 'AIzaSyC9azed9tLdjpZNjg2_kVePWvMIBq154eA'
-API_KEY = 'AIzaSyAvj4vtNocwxBpiB-UCo2TIL_yOgCvCr6E'
+API_KEY = os.environ['API_KEY']
 # Backoff time sets how many minutes to wait between google pings when your API limit is hit
 BACKOFF_TIME = 30
 # Set your output file name here.
@@ -65,7 +67,8 @@ RETURN_FULL_RESULTS = False
 addresses = []
 old_addresses = []
 
-uri = 'mongodb://user:password1@ds159025.mlab.com:59025/ri_crime_data'
+import os
+uri = os.environ['DB']
 client = MongoClient(uri)
 
 db = client.get_database()

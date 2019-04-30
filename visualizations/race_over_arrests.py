@@ -9,7 +9,8 @@ from collections import Counter
 import itertools
 import matplotlib.pyplot as plt
 
-uri = 'mongodb://user:password1@ds159025.mlab.com:59025/ri_crime_data'
+import os
+uri = os.environ['DB']
 
 client = MongoClient(uri)
 db = client.get_database()

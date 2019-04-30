@@ -18,7 +18,8 @@ from sklearn.neural_network import MLPClassifier
 
 from scipy.stats import chisquare
 
-uri = 'mongodb://user:password1@ds159025.mlab.com:59025/ri_crime_data'
+import os
+uri = os.environ['DB']
 
 client = MongoClient(uri)
 db = client.get_database()

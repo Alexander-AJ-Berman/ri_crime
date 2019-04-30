@@ -5,7 +5,8 @@ import sys, getopt, pprint
 from pymongo import MongoClient
 import googlemaps
 
-uri = 'mongodb://user:password1@ds159025.mlab.com:59025/ri_crime_data'
+import os
+uri = os.environ['DB']
 
 def get_case_addresses(db_cases):
     cases = db_cases.find()

@@ -11,7 +11,8 @@ import matplotlib.pyplot as plt
 import operator
 import numpy as np
 
-uri = 'mongodb://user:password1@ds159025.mlab.com:59025/ri_crime_data'
+import os
+uri = os.environ['DB']
 
 client = MongoClient(uri)
 db = client.get_database()
@@ -26,11 +27,11 @@ for arrest in arrests:
         officers = arrest["Arresting Officers"]
         race = arrest["Race"]
         ethnicity = arrest["Ethnicity"]
-        
+
         if officers != None:
                 # Remove leading and trailing whitespace
                 officers = officers.split(',')
-                
+
                 for officer in officers:
                         if officer != None and race != None and ethnicity != None:
                                 officer_lst.append(officer.strip())
