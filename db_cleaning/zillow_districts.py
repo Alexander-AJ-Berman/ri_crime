@@ -17,7 +17,6 @@ uri = os.environ['DB']
 
 def main():
     client = MongoClient(uri)
-
     db = client.get_database()
     db_cases = db['cases']
     db_postdata = db['postcode_data']
