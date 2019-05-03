@@ -4,7 +4,8 @@ import pandas as pd
 import sys, getopt, pprint
 from pymongo import MongoClient
 
-uri = 'mongodb://user:password1@ds159025.mlab.com:59025/ri_crime_data'
+import os
+uri = os.environ['DB']
 
 
 def add_arrest_to_case(case_num: str, statute_code: str, arrest, db_cases):
@@ -21,6 +22,14 @@ def add_arrest_to_case(case_num: str, statute_code: str, arrest, db_cases):
     query = {"CaseNumber": case_num,
              "Statute Code": statute_code}
     db_cases.update_one(query, {'$addToSet': {"Arrests": arrest}})
+
+
+def del_all_arrests_from_cases(db_cases):
+    for case in db_cases.find({"Arrests": {"$exists": False}}):
+        db_cases.update_one(case, {'$set': {"Arrests": []}})
+    # print(db_cases.find_one({"CaseNumber": case_num, "Statute Code": sc}))
+
+    print(get_num_arrests_in_cases(db_cases))
 
 
 def print_case(case_num: str, statute_code: str, db_cases):
@@ -68,38 +77,56 @@ def assert_case_num_statute_code_UID(db):
     for entry in db.find():
         id = (entry["CaseNumber"], entry["Statute Code"])
         if id in case_num_statute_code_set:
-            print(entry)
+            # print(entry)
             # DELETE ENTRY
-            # db.delete_one(entry)
+            db.delete_one(entry)
         case_num_statute_code_set.add(id)
 
     assert len(case_num_statute_code_set) == db.find().count()
     return len(case_num_statute_code_set)
 
 
-def add_case_data_to_db(cases_db, csv_path):
+def add_case_data_to_db(db_cases, csv_path):
     cases_data = pd.read_csv(csv_path)
     json_data = json.loads(cases_data.to_json(orient='records'))
     for case in json_data:
-        print(case)
-    # cases_db.find({"CaseNumber": })
+        if db_cases.find_one({"CaseNumber": case["CaseNumber"],
+                          "Statute Code": case["Statute Code"]}) is None:
+            db_cases.insert_one(case)
+
+
+def add_arrest_data_to_db(db_arrests, csv_path):
+    arrests_data = pd.read_csv(csv_path)
+    json_data = json.loads(arrests_data.to_json(orient='records'))
+    for arrest in json_data:
+        if db_arrests.find_one({"Case Number": arrest["Case Number"],
+                          "Statute Code": arrest["Statute Code"]}) is None:
+            db_arrests.insert_one(arrest)
 
 def main():
     client = MongoClient(uri)
+
     db = client.get_database()
-
-    db_postcode_data = db['postcode_data']
-    db_postcode_data.insert_one({"hello": "test"})
-
-    # db_cases = db['cases']
-    # db_arrests = db['arrests']
+    db_cases = db['cases']
+    db_arrests = db['arrests']
 
 
-    # case_data = pd.read_csv("../data/cases_new.csv")
-    # arrest_data = pd.read_csv("../data/arrests_new.csv")
+    # add new case, arrest data
+    # print("Adding cases")
+    # add_case_data_to_db(db_cases, "../data/cases_new.csv")
+    #
+    # print("Adding arrests")
+    # add_arrest_data_to_db(db_arrests, "../data/arrests_new.csv")
 
-    # case_json = json.loads(case_data.to_json(orient='records'))
-    # arrest_json = json.loads(arrest_data.to_json(orient='records'))
+    # print("combining arrests, cases")
+    # combine arrest, case data
+
+    # combine_arrests_cases_db(db_arrests, db_cases)
+
+    # reset arrests for each case
+    # del_all_arrests_from_cases(db_cases)
+    print(get_num_arrests_in_cases(db_cases))
+    # print(db_cases.find_one({"Arrests": {"$exists": False}}))
 
     # CREATE ARRESTS TABLE
     # db_arrests.insert_many(arrest_json)
