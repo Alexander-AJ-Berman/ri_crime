@@ -36,6 +36,10 @@ app.get('/', function(req, res) {
       let longitude = parseInt(row[row.indexOf("longitude")+1])
       let latdecimal = row[row.indexOf("latitude")+2]
       let londecimal = row[row.indexOf("longitude")+2]
+      let statute = row[row.indexOf("\'Statute Desc\'")+1]
+      let caseDate = row[row.indexOf("\'Reported Date\'")+1]
+      let address = row[row.indexOf("Location")+1]
+      let arrestDate = row[row.indexOf("\'Arrest Date\'")+1]
       while (latdecimal > 1) {
         latdecimal /= 10
       }
@@ -49,7 +53,7 @@ app.get('/', function(req, res) {
       if (row[row.indexOf("Arrests")+1] == "_id") {
         isArrest = true
       }
-      sample_data.push([parseFloat(latitude),parseFloat(longitude),isArrest])
+      sample_data.push([parseFloat(latitude),parseFloat(longitude),isArrest,statute,caseDate,address,arrestDate])
     })
     render(res);
   })

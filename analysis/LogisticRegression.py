@@ -61,6 +61,7 @@ def clean_data(data):
     types = get_types()
     for row in data:
         tmp = []
+        print(row)
         tmp.append(convert_to_hour(row['Reported Date']))
         tmp.append(row['Counts'])
         tmp.append(row['latitude'])
@@ -74,7 +75,6 @@ def clean_data(data):
         ml_data.append(tmp)
         if row['Arrests'] != []:
             labels.append(1)
-            numArrests += 1
         else:
             labels.append(0)
     feature_list = []
@@ -436,14 +436,13 @@ def main():
     score_list = []
     precision_list = []
     recall_list = []
-    for i in range(10):
-        df = mongo_to_df()
-        data = convert_data(df)
-        ml_data, labels, feature_list, feature_dict = clean_data(data)
-        score, precision, recall = train_and_test(ml_data, labels, feature_list, feature_dict)
-        score_list.append(score)
-        precision_list.append(precision)
-        recall_list.append(recall)
+    df = mongo_to_df()
+    data = convert_data(df)
+    ml_data, labels, feature_list, feature_dict = clean_data(data)
+    score, precision, recall = train_and_test(ml_data, labels, feature_list, feature_dict)
+    score_list.append(score)
+    precision_list.append(precision)
+    recall_list.append(recall)
     avg_score = np.mean(score_list)
     avg_precision = np.mean(precision_list)
     avg_recall = np.mean(recall_list)

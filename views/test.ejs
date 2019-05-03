@@ -20,30 +20,35 @@
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAvj4vtNocwxBpiB-UCo2TIL_yOgCvCr6E&libraries=visualization"></script>
   <script>
     let data = "<%= data %>";
+    let dataList = data.split(",")
     let providence = {
       lat: 41.8240,
       lng: -71.4128
     };
 
     function initialize() {
+
       let map = new google.maps.Map(document.getElementById('map'), {
         zoom: 12,
         center: providence
       });
 
-      let points = generateHeatMap(map)
+      let allPoints = getAllPoints()
+      let arrestPoints = getArrestsOnly()
+
       var heatmap = new google.maps.visualization.HeatmapLayer({
-            data: points,
+            data: generateHeatMap(allPoints),
             map: map
       });
-      let arrestPoints = generateArrestPoints(map)
+      
       var arrestsheatmap = new google.maps.visualization.HeatmapLayer({
-            data: arrestPoints,
+            data: generateArrestPoints(arrestPoints),
             map: map
       });
 
       heatmap.set('radius', 50);
       heatmap.set('opacity',0.5)
+
       arrestsheatmap.set('gradient',[
           'rgba(0, 255, 255, 0)',
           'rgba(0, 255, 255, 1)',
@@ -62,57 +67,97 @@
         ])
         arrestsheatmap.set('radius',10)
         arrestsheatmap.set('opacity',1)
+
+      generateRandomArrestMarkers(arrestPoints, map)
     }
 
-    function generateHeatMap(map) {
-      let dataList = data.split(",")
+    function getAllPoints() {
       let points = []
-      let numArrests = 0
-      for (let i = 0; i < dataList.length; i += 3) {
+      for (let i = 0; i < dataList.length; i+=7) {
         let lat = parseFloat(dataList[i])
         let lon = parseFloat(dataList[i+1])
-        if (isNaN(lat) || isNaN(lon)) {
-          continue
-        } 
         let isArrest = dataList[i+2]
         if (isArrest == "false") {
           isArrest = false
         } else {
           isArrest = true
         }
-        
-        let point = new google.maps.LatLng(lat,lon)
-        let weight = 1
+        let statute = dataList[i+3]
+        points.push({"lat":lat,"lon":lon,"isArrest":isArrest,"statute":statute})
+      }
+      return points
+    }
+
+    function getArrestsOnly() {
+      let points = []
+      for (let i = 0; i < dataList.length; i+=7) {
+        let lat = parseFloat(dataList[i])
+        let lon = parseFloat(dataList[i+1])
+        let isArrest = dataList[i+2]
+        if (isArrest == "false") {
+          isArrest = false
+        } else {
+          isArrest = true
+        }
+        let statute = dataList[i+3]
+        let caseDate = dataList[i+4]
+        let address = dataList[i+5]
+        let arrestDate = dataList[i+6]
         if (isArrest) {
-          weight = 2
+          points.push({"lat":lat,"lon":lon,"statute":statute,"caseDate":caseDate,"address":address,"arrestDate":arrestDate})
         }
-        let datapoint = {location: point, weight: 1}
-        points.push(datapoint)
       }
       return points
     }
 
-    function generateArrestPoints(map) {
-      let dataList = data.split(",")
+    function generateHeatMap(allPoints) {
       let points = []
-      for (let i = 0; i < dataList.length; i+=3) {
-        let lat = parseFloat(dataList[i])
-        let lon = parseFloat(dataList[i+1])
-        let isArrest = dataList[i+2]
-        if (isArrest == "false") {
-          isArrest = false
-        } else {
-          isArrest = true
-        }
-        if (isNaN(lat) || isNaN(lon) || !isArrest) {
-          continue
-        }
+      for (let i = 0; i < allPoints.length; i++) {
+        let lat = allPoints[i]["lat"]
+        let lon = allPoints[i]["lon"]
+        if (isNaN(lat) || isNaN(lon)) {continue}
         let point = new google.maps.LatLng(lat,lon)
-        let datapoint = {location: point, weight: 1}
-        points.push(datapoint)
-         
+        points.push(point)
       }
       return points
+    }
+
+    function generateArrestPoints(arrestPoints) {
+      let points = []
+      for (let i = 0; i < arrestPoints.length; i++) {
+        let lat = arrestPoints[i]["lat"]
+        let lon = arrestPoints[i]["lon"]
+        if (isNaN(lat) || isNaN(lon)) {continue}
+        let point = new google.maps.LatLng(lat,lon)
+        points.push(point)
+      }
+      return points
+    }
+
+    function generateRandomArrestMarkers(arrestPoints, map) {
+      let numToGenerate = 20
+      let maxNum = arrestPoints.length
+      for (let i = 0; i < numToGenerate; i++) {
+        index = Math.floor(Math.random() * Math.floor(maxNum))
+        let lat = arrestPoints[i]["lat"]
+        let lon = arrestPoints[i]["lon"]
+        if (isNaN(lat) || isNaN(lon)) {continue}
+        let point = new google.maps.LatLng(lat,lon)
+        let marker = new google.maps.Marker({position : point,map : map})
+        let statute = arrestPoints[i]["statute"]
+        let caseDate = arrestPoints[i]["caseDate"]
+        let address = arrestPoints[i]["address"]
+        let arrestDate = arrestPoints[i]["arrestDate"]
+        let message = '<div id="content">' + '<div id="siteNotice">' + '</div>' +
+            '<h1 id="firstHeading" class="firstHeading">' + statute + '</h1>' +
+            '<div id="bodyContent">' + '<p>Time case was reported: ' + caseDate + 
+            '<br>' + 'Time arrest was made: ' + arrestDate + '<br>' +
+            'Location of crime: ' + address + '</p>' + '</div>' + '</div>'
+        let infoWindow = new google.maps.InfoWindow({content : message})
+        marker.addListener('click', function() {
+          console.log(infoWindow.open(marker.get('map'), marker))
+        })
+      }
     }
 
     google.maps.event.addDomListener(window, 'load', initialize);
